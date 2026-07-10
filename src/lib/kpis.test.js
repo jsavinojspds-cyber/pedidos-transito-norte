@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { computeKpis, statusCounts, getAlertas, statusColor } from './kpis.js'
+import {
+  computeKpis,
+  statusCounts,
+  getAlertas,
+  statusColor,
+  kpisPorVendedor,
+  nomeCurtoVendedor,
+} from './kpis.js'
 
 const base = [
   { chave: '1', status_transito: 'Entregue no prazo', valor_faturado: 100, peso: 10, estado: 'AM' },
@@ -60,5 +67,34 @@ describe('statusColor', () => {
     expect(statusColor('Atrasado')).toBe('#ef4444')
     expect(statusColor('Em trânsito')).toBe('#3b82f6')
     expect(statusColor('desconhecido')).toBe('#9ca3af')
+  })
+})
+
+describe('kpisPorVendedor', () => {
+  it('agrupa métricas por vendedor', () => {
+    const pedidos = [
+      { vendedor: 'NAILSON F COSTA', status_transito: 'Entregue no prazo', valor_faturado: 100 },
+      { vendedor: 'NAILSON F COSTA', status_transito: 'Atrasado', valor_faturado: 50 },
+      { vendedor: 'DANIELA NASCIMENTO DA SILVA', status_transito: 'Entregue em atraso', valor_faturado: 30 },
+    ]
+    const r = kpisPorVendedor(pedidos)
+    const nailson = r.find((x) => x.vendedor === 'NAILSON F COSTA')
+    expect(nailson.total).toBe(2)
+    expect(nailson.atrasados).toBe(1)
+    expect(nailson.otd).toBe(1)
+    expect(nailson.valor).toBe(150)
+    const daniela = r.find((x) => x.vendedor === 'DANIELA NASCIMENTO DA SILVA')
+    expect(daniela.atrasados).toBe(1)
+    expect(daniela.otd).toBe(0)
+  })
+})
+
+describe('nomeCurtoVendedor', () => {
+  it('encurta os nomes conhecidos', () => {
+    expect(nomeCurtoVendedor('FURTADO E GEMAQUE LTDA (FREDERICSON)')).toBe('Fredericson')
+    expect(nomeCurtoVendedor('NAILSON F COSTA')).toBe('Nailson')
+  })
+  it('mantém desconhecido', () => {
+    expect(nomeCurtoVendedor('OUTRO')).toBe('OUTRO')
   })
 })

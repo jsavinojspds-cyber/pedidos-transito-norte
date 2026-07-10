@@ -15,7 +15,10 @@ export default function AppShell({ children }) {
   return (
     <div className="min-h-full flex flex-col">
       <header className="flex items-center justify-between px-4 py-3 border-b border-stone-800">
-        <span className="text-duty-gold font-semibold">Pedidos · Norte</span>
+        <div className="flex items-baseline gap-2">
+          <span className="wordmark text-duty-gold">DUTY</span>
+          <span className="text-stone-500 text-xs">Norte</span>
+        </div>
         <div className="flex items-center gap-3">
           {isAdmin && <Link to="/admin" className="text-stone-400 text-sm hover:text-duty-gold">Carga</Link>}
           <button onClick={signOut} className="text-stone-500 text-sm hover:text-duty-gold">Sair</button>
@@ -25,6 +28,7 @@ export default function AppShell({ children }) {
       <nav className="flex border-t border-stone-800 bg-duty-bg">
         {tab('/', 'Dashboard')}
         {tab('/pedidos', 'Pedidos')}
+        {isAdmin && tab('/comparativo', 'Comparativo')}
       </nav>
     </div>
   )

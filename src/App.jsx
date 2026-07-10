@@ -7,6 +7,7 @@ import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Pedidos from './pages/Pedidos.jsx'
 import PedidoDetalhe from './pages/PedidoDetalhe.jsx'
+import Comparativo from './pages/Comparativo.jsx'
 
 const Admin = lazy(() => import('./pages/Admin.jsx'))
 const Loading = () => (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/pedidos" element={<ProtectedRoute><Pedidos /></ProtectedRoute>} />
           <Route path="/pedido/:chave" element={<ProtectedRoute><PedidoDetalhe /></ProtectedRoute>} />
+          <Route path="/comparativo" element={<AdminRoute><Comparativo /></AdminRoute>} />
           <Route
             path="/admin"
             element={<AdminRoute><Suspense fallback={<Loading />}><Admin /></Suspense></AdminRoute>}

@@ -23,7 +23,11 @@ export default function Login() {
   return (
     <div className="min-h-full flex items-center justify-center p-6">
       <form onSubmit={handleSubmit} className="bg-duty-card w-full max-w-sm rounded-2xl p-8 space-y-4">
-        <h1 className="text-duty-gold text-xl font-semibold text-center">Pedidos em Trânsito — Norte</h1>
+        <div className="text-center">
+          <p className="wordmark text-duty-gold text-2xl">DUTY</p>
+          <p className="text-stone-400 text-sm mt-1">Pedidos em Trânsito · Norte</p>
+        </div>
+        <div className="gold-line rounded-full" />
         <input
           type="email" required placeholder="E-mail" value={email}
           onChange={(e) => setEmail(e.target.value)}

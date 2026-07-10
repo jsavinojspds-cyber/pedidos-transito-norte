@@ -22,6 +22,20 @@ export function statusColor(status) {
   return COLORS[status] ?? '#9ca3af'
 }
 
+export const NOME_CURTO = {
+  'FURTADO E GEMAQUE LTDA (FREDERICSON)': 'Fredericson',
+  'NAILSON F COSTA': 'Nailson',
+  'OREN REPRESENTACOES (ROSIMARA)': 'Rosimara',
+  'DANIELA NASCIMENTO DA SILVA': 'Daniela',
+  'FURTADO E GEMAQUE LTDA (ANA GEMAQUE)': 'Ana Gemaque',
+  'ORTIZ E OLIVEIRA REP E COM (SCARLETTY)': 'Scarletty',
+  'ES ANDRADE REPRESENTACOES (EDUARDO)': 'Eduardo',
+}
+
+export function nomeCurtoVendedor(v) {
+  return NOME_CURTO[v] ?? v
+}
+
 export function computeKpis(pedidos) {
   let noPrazo = 0, emAtraso = 0, emTransito = 0, atrasado = 0, aguardExp = 0
   let valorTotal = 0, pesoTotal = 0
@@ -62,4 +76,27 @@ export function getAlertas(pedidos, hoje = new Date().toISOString().slice(0, 10)
     if (p.previsao_entrega && !p.data_real_entrega && p.previsao_entrega < hoje) return true
     return false
   })
+}
+
+export function kpisPorVendedor(pedidos) {
+  const grupos = new Map()
+  for (const p of pedidos) {
+    const v = p.vendedor || '—'
+    if (!grupos.has(v)) grupos.set(v, [])
+    grupos.get(v).push(p)
+  }
+  const out = []
+  for (const [vendedor, lista] of grupos) {
+    const k = computeKpis(lista)
+    out.push({
+      vendedor,
+      nome: nomeCurtoVendedor(vendedor),
+      total: k.total,
+      otd: k.otd,
+      atrasados: k.atrasados,
+      emTransito: k.emTransito,
+      valor: k.valorTotal,
+    })
+  }
+  return out.sort((a, b) => a.nome.localeCompare(b.nome))
 }
