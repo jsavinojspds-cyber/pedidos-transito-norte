@@ -3,3 +3,9 @@ dist
 .env.local
 *.log
 .DS_Store
+
+# automacao (Python) - segredos e ambiente local
+automacao/config.env
+automacao/.venv
+__pycache__/
+*.pyc
