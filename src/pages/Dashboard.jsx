@@ -4,6 +4,7 @@ import KpiCard from '../components/KpiCard.jsx'
 import StatusChart from '../components/StatusChart.jsx'
 import AlertList from '../components/AlertList.jsx'
 import RcaFilter from '../components/RcaFilter.jsx'
+import CargaBanner from '../components/CargaBanner.jsx'
 import { usePedidos } from '../hooks/usePedidos.js'
 import { useAuth } from '../context/AuthProvider.jsx'
 import { computeKpis, statusCounts, getAlertas, statusColor } from '../lib/kpis.js'
@@ -29,6 +30,7 @@ export default function Dashboard() {
   return (
     <AppShell>
       <div className="p-4 space-y-5">
+        <CargaBanner />
         {loading && <p className="text-stone-400">Carregando…</p>}
         {error && <p className="text-status-late">Erro ao carregar: {error}</p>}
         {!loading && !error && (

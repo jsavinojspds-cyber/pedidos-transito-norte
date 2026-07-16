@@ -22,6 +22,9 @@ vi.mock('../components/StatusChart.jsx', () => ({
 vi.mock('../context/AuthProvider.jsx', () => ({
   useAuth: () => ({ isAdmin: false }),
 }))
+vi.mock('../components/CargaBanner.jsx', () => ({
+  default: () => null,
+}))
 
 import Dashboard from './Dashboard.jsx'
 

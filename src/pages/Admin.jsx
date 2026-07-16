@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import * as XLSX from 'xlsx'
 import { parseWorkbook } from '../lib/pedidosParser.js'
 import { upsertPedidos } from '../lib/upsertPedidos.js'
+import { registrarCarga } from '../lib/cargaInfo.js'
 
 export default function Admin() {
   const [status, setStatus] = useState('idle') // idle | lendo | gravando | ok | erro
@@ -19,7 +20,15 @@ export default function Admin() {
       const { pedidos, ignorados } = parseWorkbook(wb)
       setStatus('gravando')
       const r = await upsertPedidos(pedidos)
-      setResumo({ ...r, ignorados, quando: new Date().toLocaleString('pt-BR') })
+      // registra QUAL arquivo gerou esta carga (aparece no Dashboard)
+      await registrarCarga({
+        arquivo: file.name,
+        total: r.total,
+        inseridos: r.inseridos,
+        atualizados: r.atualizados,
+        ignorados,
+      })
+      setResumo({ ...r, ignorados, arquivo: file.name, quando: new Date().toLocaleString('pt-BR') })
       setStatus('ok')
     } catch (err) {
       setErro(err.message || 'Falha ao processar a planilha.')
@@ -50,6 +59,7 @@ export default function Admin() {
       {resumo && (
         <div className="bg-duty-card rounded-2xl p-6 mt-4 space-y-1">
           <p className="text-status-ok font-semibold">Carga concluída ✓</p>
+          <p className="text-stone-300 text-sm">Arquivo: <b className="text-duty-gold break-all">{resumo.arquivo}</b></p>
           <p className="text-stone-300">Inseridos: <b>{resumo.inseridos}</b></p>
           <p className="text-stone-300">Atualizados: <b>{resumo.atualizados}</b></p>
           <p className="text-stone-300">Total gravado: <b>{resumo.total}</b></p>
