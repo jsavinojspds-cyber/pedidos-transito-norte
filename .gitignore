@@ -9,3 +9,8 @@ automacao/config.env
 automacao/.venv
 __pycache__/
 *.pyc
+
+# planilhas com dados reais (repo e publico!) - nunca versionar
+*.xlsx
+*.xls
+*.xlsm

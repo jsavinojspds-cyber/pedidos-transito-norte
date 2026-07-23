@@ -239,17 +239,32 @@ def chaves_existentes(cfg, token):
     return {r["chave"] for r in json.loads(corpo)}
 
 
-def upsert(cfg, token, pedidos):
+def upsert(cfg, token, pedidos, carimbo):
     url = f"{cfg['SUPABASE_URL']}/rest/v1/pedidos?on_conflict=chave"
     h = {
         "apikey": cfg["SUPABASE_ANON_KEY"], "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
         "Prefer": "resolution=merge-duplicates,return=minimal",
     }
-    carimbo = datetime.now().astimezone().isoformat()
     for i in range(0, len(pedidos), LOTE):
         lote = [dict(p, updated_at=carimbo) for p in pedidos[i:i + LOTE]]
         _req(url, h, lote, "POST")
+
+
+def remover_residuo(cfg, token, carimbo):
+    """Remove os pedidos que NAO vieram nesta carga (sairam do relatorio de hoje),
+    para o banco espelhar exatamente o arquivo atual. So admin consegue (RLS)."""
+    from urllib.parse import quote
+    url = f"{cfg['SUPABASE_URL']}/rest/v1/pedidos?updated_at=lt.{quote(carimbo)}"
+    h = {
+        "apikey": cfg["SUPABASE_ANON_KEY"], "Authorization": f"Bearer {token}",
+        "Prefer": "return=representation",
+    }
+    _, corpo = _req(url, h, metodo="DELETE")
+    try:
+        return len(json.loads(corpo))
+    except Exception:
+        return 0
 
 
 def registrar_carga(cfg, token, user_id, arquivo, total, inseridos, atualizados, ignorados):
@@ -269,6 +284,8 @@ def main():
     ap = argparse.ArgumentParser(description="Carga dos Pedidos em Transito (Norte)")
     ap.add_argument("--dry-run", action="store_true", help="so le e mostra o resumo")
     ap.add_argument("--arquivo", help="caminho do .xlsx (sobrescreve o config)")
+    ap.add_argument("--sem-sync", action="store_true",
+                    help="nao remover pedidos que sairam do relatorio (mantem tudo)")
     args = ap.parse_args()
 
     cfg = carregar_config()
@@ -301,10 +318,17 @@ def main():
     atualizados = sum(1 for c in novas if c in antigas)
     inseridos = len(novas) - atualizados
 
-    upsert(cfg, token, pedidos)
+    carimbo = datetime.now().astimezone().isoformat()
+    upsert(cfg, token, pedidos, carimbo)
     registrar_carga(cfg, token, user_id, arquivo, len(novas), inseridos, atualizados, ignorados)
 
+    removidos = 0
+    if not args.sem_sync:
+        removidos = remover_residuo(cfg, token, carimbo)
+
     print(f"\nOK! Inseridos: {inseridos} | Atualizados: {atualizados} | Total: {len(novas)}")
+    if not args.sem_sync:
+        print(f"Removidos (sairam do relatorio): {removidos}")
     print(f"Registrado no app como: {os.path.basename(arquivo)}")
 
 
