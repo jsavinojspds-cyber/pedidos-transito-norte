@@ -7,7 +7,7 @@ export default function AppShell({ children }) {
   const tab = (to, label) => (
     <Link
       to={to}
-      className={`flex-1 text-center py-3 text-sm ${pathname === to ? 'text-duty-gold' : 'text-stone-400'}`}
+      className={`flex-1 text-center py-3 text-xs ${pathname === to ? 'text-duty-gold' : 'text-stone-400'}`}
     >
       {label}
     </Link>
@@ -29,6 +29,7 @@ export default function AppShell({ children }) {
         {tab('/', 'Dashboard')}
         {tab('/pedidos', 'Pedidos')}
         {tab('/leadtime', 'Lead time')}
+        {tab('/ciclo', 'Ciclo')}
         {isAdmin && tab('/comparativo', 'Comparativo')}
       </nav>
     </div>
