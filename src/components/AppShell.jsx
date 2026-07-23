@@ -28,6 +28,7 @@ export default function AppShell({ children }) {
       <nav className="flex border-t border-stone-800 bg-duty-bg">
         {tab('/', 'Dashboard')}
         {tab('/pedidos', 'Pedidos')}
+        {tab('/leadtime', 'Lead time')}
         {isAdmin && tab('/comparativo', 'Comparativo')}
       </nav>
     </div>
